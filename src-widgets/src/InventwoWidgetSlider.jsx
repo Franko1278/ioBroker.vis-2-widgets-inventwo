@@ -8,12 +8,18 @@ import InventwoGeneric from './InventwoGeneric';
 class InventwoWidgetSlider extends InventwoGeneric {
     constructor(props) {
         super(props);
-        this.state.sliderValue = 0;
+        this.state.sliderValue = 0;         // Wert, der gespeichert/geschrieben wird
+        this.state.sliderDisplayValue = 0;  // Wert, der angezeigt wird
     }
+
 
     componentDidMount() {
         super.componentDidMount();
-        this.setState({ sliderValue: this.getValue(this.state.rxData.oid) });
+        const initialValue = this.getValue(this.state.rxData.oid);
+        this.setState({ 
+            sliderValue: initialValue,
+            sliderDisplayValue: initialValue,
+        });
     }
 
     static getWidgetInfo() {
@@ -356,7 +362,10 @@ class InventwoWidgetSlider extends InventwoGeneric {
 
     onStateUpdated(id, state) {
         if (id === this.state.rxData.oid && state && state.val !== this.state.sliderValue) {
-            this.setState({ sliderValue: state.val });
+            this.setState({ 
+                sliderValue: state.val,
+                sliderDisplayValue: state.val,
+            });
         }
     }
 
@@ -469,19 +478,23 @@ class InventwoWidgetSlider extends InventwoGeneric {
         return <Slider
             disabled={this.props.editMode}
             sx={sliderAttributes}
-            onChange={(e, val) => this.setState({ sliderValue: val })}
+            value={this.state.sliderDisplayValue || 0}
+            onChange={(e, val) => this.setState({ sliderDisplayValue: val })}
             onChangeCommitted={(e, val) =>
-                this.setState({ sliderValue: val }, () =>
-                    this.onChange(e, val))}
+                this.setState({ 
+                    sliderValue: val,
+                    sliderDisplayValue: val,
+                }, () => this.onChange(e, val))
+            }
             min={this.state.rxData.minValue}
             max={this.state.rxData.maxValue}
             step={this.state.rxData.step}
-            value={this.state.sliderValue || 0}
             valueLabelDisplay="auto"
             track={trackStyle.trackBarType}
             orientation={this.state.rxData.orientation}
             marks={marks}
-        />;
+        />
+
     }
 }
 
